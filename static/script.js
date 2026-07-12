@@ -17,6 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (data.status === 'success') {
                 flightData = data.data;
                 fileBadge.textContent = `Data Source: ${data.file_used}`;
+                document.getElementById('target-badge').textContent = `Target: ${data.search_target}`;
                 
                 renderStats(flightData);
                 renderTable(flightData);

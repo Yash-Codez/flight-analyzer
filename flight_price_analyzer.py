@@ -734,6 +734,7 @@ class FlightAnalyzerBot:
 
     def _build_record(self, origin: str, ap: dict, dep_date, offer: dict) -> dict:
         return {
+            "Search_Target":     self.cfg["TARGET_DESTINATION"],
             "Origin":            origin,
             "Destination_IATA":  ap["iata"],
             "Destination_Name":  ap["name"],

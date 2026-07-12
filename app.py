@@ -49,6 +49,7 @@ def get_flights():
         return jsonify({
             "status": "success",
             "file_used": os.path.basename(latest_csv),
+            "search_target": df['Search_Target'].iloc[0] if 'Search_Target' in df.columns and len(df) > 0 else "N/A",
             "total_records": len(flights),
             "data": flights
         })
