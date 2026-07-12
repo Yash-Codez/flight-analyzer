@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flight Price Analyzer Dashboard</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Main Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="background-elements">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+    </div>
+
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <h1>Flight Price Analyzer <span>Dashboard</span></h1>
+                <p>Real-time radius search analysis with stealth Playwright.</p>
+            </div>
+            <div class="stats-cards" id="stats-container">
+                <!-- Injected via JS -->
+                <div class="card skeleton"></div>
+                <div class="card skeleton"></div>
+                <div class="card skeleton"></div>
+            </div>
+        </header>
+
+        <main>
+            <!-- Optimization Journey Section -->
+            <section class="optimization-section glass-panel">
+                <h2>🚀 The Optimization Journey</h2>
+                <p class="subtitle">How we slashed execution time from 115 minutes down to just 35 minutes.</p>
+                
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-icon red"></div>
+                        <div class="timeline-content">
+                            <h3>Initial Implementation</h3>
+                            <p><strong>Execution Time: ~115 minutes (for 99 queries)</strong></p>
+                            <p>The original script ran synchronously. Each page load on Google Flights took ~70 seconds due to stealth operations and DOM waiting. We scraped routes one by one.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-icon orange"></div>
+                        <div class="timeline-content">
+                            <h3>Failed Attempt: ThreadPoolExecutor</h3>
+                            <p><strong>Result: Threading conflicts</strong></p>
+                            <p>We attempted to use a <code>ThreadPoolExecutor</code> to run 3 browser instances in parallel. However, Playwright's Sync API uses the main thread's asyncio loop under the hood, causing <code>I/O operation on closed pipe</code> errors when workers tried to close contexts concurrently.</p>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-icon green"></div>
+                        <div class="timeline-content">
+                            <h3>Final Solution: Native Asyncio</h3>
+                            <p><strong>Execution Time: ~35 minutes</strong></p>
+                            <p>We rewrote the Playwright scraper to use the <code>playwright.async_api</code> native to asyncio. By using <code>asyncio.Semaphore(3)</code>, we capped concurrent headless browsers to 3. This fully leveraged the network I/O wait times and perfectly parallelized the workload without thread safety issues.</p>
+                            <div class="tech-stack">
+                                <span>Python</span>
+                                <span>Playwright Async</span>
+                                <span>Asyncio</span>
+                                <span>Semaphore</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Flight Results Table -->
+            <section class="results-section glass-panel">
+                <div class="section-header">
+                    <h2>Live Flight Data</h2>
+                    <div class="controls">
+                        <input type="text" id="search-input" placeholder="Search by airport or airline...">
+                        <span id="file-used-badge" class="badge">Loading...</span>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table id="flights-table">
+                        <thead>
+                            <tr>
+                                <th data-sort="Date">Date <span>↕</span></th>
+                                <th data-sort="Destination_IATA">Destination <span>↕</span></th>
+                                <th data-sort="Airline">Airline <span>↕</span></th>
+                                <th data-sort="Flight_Type">Type <span>↕</span></th>
+                                <th data-sort="Price_INR">Price (INR) <span>↕</span></th>
+                            </tr>
+                        </thead>
+                        <tbody id="flights-body">
+                            <!-- Injected via JS -->
+                            <tr><td colspan="5" style="text-align:center;">Fetching data...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+        
+        <footer>
+            <p>Built with <span style="color: #ff3366;">♥</span> by Antigravity AI.</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

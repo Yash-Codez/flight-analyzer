@@ -1,0 +1,9 @@
+__pycache__/
+*.pyc
+.env
+venv/
+env/
+flight_bot.log
+flight_results/*.csv
+flight_results/*.xlsx
+!flight_results/.gitkeep
