@@ -40,8 +40,8 @@ def get_flights():
         # Read the CSV using pandas
         df = pd.read_csv(latest_csv)
         
-        # Replace NaN values with None for proper JSON serialization
-        df = df.where(pd.notnull(df), None)
+        # Replace NaN/NaT values with a string or None for proper JSON serialization
+        df = df.fillna("N/A")
         
         # Convert to list of dictionaries
         flights = df.to_dict(orient='records')
@@ -56,6 +56,6 @@ def get_flights():
         return jsonify({"error": f"Failed to parse data: {str(e)}"}), 500
 
 if __name__ == '__main__':
-    print("🚀 Starting Flight Price Analyzer Dashboard...")
-    print("👉 Open http://localhost:5000 in your browser")
+    print("[STARTING] Flight Price Analyzer Dashboard...")
+    print("[INFO] Open http://localhost:5000 in your browser")
     app.run(debug=True, host='0.0.0.0', port=5000)
