@@ -434,18 +434,27 @@ class PlaywrightFlightFetcher:
                 try:
                     label = await el.get_attribute("aria-label") or ""
                     ll    = label.lower()
-                    if "hour" not in ll:
-                        continue
-                    if not any(k in ll for k in ("rupee", "inr", "stop", "nonstop")):
+                    # Google Flights aria-labels in India might say 'hr' or 'hour', and '₹' or 'rupee'
+                    if not ("hour" in ll or "hr" in ll or "m" in ll):
                         continue
                     price = _extract_best_price(label)
                     if price <= 0:
                         continue
+                    
                     stops    = 0 if "nonstop" in ll else (1 if "1 stop" in ll else 2)
-                    m_air    = re.match(r"^([^,]+)", label)
+                    
+                    # Extract airline: it's usually at the beginning of the label or after "Flights with"
+                    airline = "Unknown"
+                    if "flights with" in ll:
+                        m_air = re.search(r"with\s+([^.]+)", label, re.I)
+                        if m_air: airline = m_air.group(1).strip()
+                    else:
+                        m_air = re.match(r"^([^,]+)", label)
+                        if m_air: airline = m_air.group(1).strip()
+                        
                     m_dur    = re.search(r"(\d+\s*hours?\s*(?:\d+\s*minutes?)?)", label, re.I)
-                    airline  = m_air.group(1).strip()  if m_air else "Unknown"
                     duration = m_dur.group(1).strip()  if m_dur else "N/A"
+                    
                     results.append({
                         "Airline":     airline[:35],
                         "Price_INR":   price,
@@ -823,7 +832,18 @@ if __name__ == "__main__":
 """)
         sys.exit(1)
 
-    bot = FlightAnalyzerBot(CONFIG)
+    bot_config = CONFIG.copy()
+    
+    print("\n" + "="*60)
+    print(" 🛫 FLIGHT PRICE ANALYZER BOT")
+    print("="*60)
+    
+    # Ask for arrival location (target destination)
+    user_dest = input(f"\nEnter arrival location [default: {CONFIG['TARGET_DESTINATION']}]: ").strip()
+    if user_dest:
+        bot_config["TARGET_DESTINATION"] = user_dest
+
+    bot = FlightAnalyzerBot(bot_config)
     try:
         bot.run()
     except KeyboardInterrupt:
