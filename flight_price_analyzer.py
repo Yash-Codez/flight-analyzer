@@ -449,8 +449,19 @@ class PlaywrightFlightFetcher:
                         m_air = re.search(r"with\s+([^.]+)", label, re.I)
                         if m_air: airline = m_air.group(1).strip()
                     else:
-                        m_air = re.match(r"^([^,]+)", label)
-                        if m_air: airline = m_air.group(1).strip()
+                        # Sometimes starts with "Monday, 7 Aug. IndiGo, ..."
+                        # Split by period and comma, filter out dates/days
+                        parts = re.split(r'[,.]', label)
+                        for p in parts:
+                            p_clean = p.strip()
+                            # Skip parts that look like dates or days or times
+                            if any(day in p_clean for day in ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]):
+                                continue
+                            if re.search(r'\d', p_clean): # skip segments with numbers (dates, times, prices)
+                                continue
+                            if len(p_clean) > 2:
+                                airline = p_clean
+                                break
                         
                     m_dur    = re.search(r"(\d+\s*hours?\s*(?:\d+\s*minutes?)?)", label, re.I)
                     duration = m_dur.group(1).strip()  if m_dur else "N/A"
@@ -835,7 +846,7 @@ if __name__ == "__main__":
     bot_config = CONFIG.copy()
     
     print("\n" + "="*60)
-    print(" 🛫 FLIGHT PRICE ANALYZER BOT")
+    print(" [***] FLIGHT PRICE ANALYZER BOT")
     print("="*60)
     
     # Ask for arrival location (target destination)
